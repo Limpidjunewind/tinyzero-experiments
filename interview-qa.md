@@ -172,3 +172,39 @@
 > 这就是 fit() 第 1 步的输出 old_log_probs，后面用来算 KL（和 Ref 比）和 clip ratio（和新 Actor 比）。
 > 如果等 Actor 更新后再算，old 和 new 就是同一个模型，clip ratio 恒为 1，PPO 的约束机制完全失效。
 
+---
+
+## Day 6（2026-03-26）：对比实验 + 训练诊断
+
+**Q: 你跑了几组实验？结果是什么？**
+> A: 三组：Qwen2-0.5B（PPO）、Qwen2.5-1.5B（PPO + GRPO）、Qwen2.5-3B（PPO）。
+> 0.5B：score 卡在 0.10，从未出现 `<think>`，RL 完全无效。
+> 1.5B PPO：score 0.3–0.5，出现空 `<think>`，找到了格式捷径但没有真实推理。
+> 1.5B GRPO：score 卡在 0.10，150 步未收敛，没有 Critic 信号更难起步。
+> 3B PPO：score 0.3–0.4，`<think>` 有真实内容，step ~250 entropy 坍塌。
+> 结论：三个规模跨越三个门槛——无 think → 空 think → 有内容的 think。
+
+**Q: pg_loss 归零和 entropy collapse 哪个先发生？因果关系是什么？**
+> A: pg_loss 先归零，entropy 随后坍塌，之前搞反了。
+> 因果链：模型在 step ~100 找到"空 think + format reward"捷径 → pg_loss 归零（策略停止更新）→ 输出固定后 entropy 随之坍塌。
+> entropy collapse 是策略停止更新的结果，不是原因。
+
+**Q: entropy 和 pg_loss 归零后 score 还在涨，说明模型还在学习吗？**
+> A: 不是。entropy ≈ 0、pg_loss ≈ 0 后 score 继续涨是方差降低的假象：
+> rollout 方差下降，原来就会的题开始稳定答对，score 自然上升。
+> 但策略没有改进，模型没有在学新东西。entropy 和 pg_loss 是比 score 更诚实的诊断信号。
+
+**Q: 3B 模型比 1.5B 更快 entropy 坍塌，怎么解释？**
+> A: 反直觉但合理：能力越强 → 越快找到稳定策略（如空 think 捷径）→ PPO 越快强化这个策略 → entropy 越快锁死。
+> 能力强在这里是更快失去探索性的代价，不是优势。
+
+**Q: 你的实验对 cold start 有什么结论？**
+> A: outcome reward 的有效性依赖模型的初始能力。模型需要在随机探索阶段就能偶尔答对，reward 信号才能起作用。
+> 0.5B 做不到这一点，RL 完全无法激励推理链。
+> cold start（先 SFT 再 RL）是必要条件，不是可选优化——它给模型一个探索起点，让 reward 信号有机会生效。
+
+**Q: 实验中怎么判断 Critic 是否过拟合？**
+> A: 观察 values 和 returns 的关系。如果 Critic 过拟合，values 会收敛到接近 returns，advantage ≈ 0，Actor 梯度消失。
+> 实测 values ≈ 0、returns ≈ 0.3，advantage 始终有值，说明 Critic 正常工作，没有过拟合。
+> `score ≈ rewards` 只说明 KL 惩罚极小，不代表 advantage ≈ 0，两者不能混淆。
+
