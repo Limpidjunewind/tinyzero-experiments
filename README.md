@@ -10,10 +10,8 @@ The goal was not just to run the numbers — it was to understand *why* training
 
 | | |
 |---|---|
-| **[Part I: Scale · Batch · Entropy Collapse](webshowcase/chapter1.html)** | Does model size matter? What triggers the Aha Moment? Why do all runs crash at bs=256? |
-| **[Part II: Reward Function Design](webshowcase/chapter2.html)** | Sparse reward is the bottleneck — three reward designs, one variable, two surprises |
-
-> If reading on GitHub, clone and open the HTML files locally, or visit via [GitHub Pages](https://limpidjunewind.github.io/tinyzero-experiments/webshowcase/chapter1.html) once enabled.
+| **[Part I: Scale · Batch · Entropy Collapse](https://limpidjunewind.github.io/tinyzero-experiments/webshowcase/chapter1.html)** | Does model size matter? What triggers the Aha Moment? Why do all runs crash at bs=256? |
+| **[Part II: Reward Function Design](https://limpidjunewind.github.io/tinyzero-experiments/webshowcase/chapter2.html)** | Sparse reward is the bottleneck — three reward designs, one variable, two surprises |
 
 ---
 
