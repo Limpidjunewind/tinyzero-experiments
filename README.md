@@ -48,6 +48,7 @@ reports/              Detailed experiment notes
   4.18 - entropy_coeff_ablation_3B.md
   4.20 - batch_size_aha_moment_ablation.md
   4.20 - entropy_collapse_analysis.md
+  experiment_report_reward.md
   sft-vs-rl-practice.md
 
 assets/               Charts and figures referenced in reports
@@ -55,14 +56,10 @@ assets/               Charts and figures referenced in reports
 scripts/              Analysis code
   eval_think_analysis.py     Evaluates <think> chain quality across checkpoints
   logit_analysis.py          Probes token-level log_prob distributions
+  slurm/                     Training scripts for each experiment configuration
 
 patches/
   megatron_v4.patch          Framework-level modifications to veRL
-
-TinyZero_Local/       Training code (fork of TinyZero)
-  *.slurm               Training scripts for various experiment configurations
-  examples/             Data preprocessing
-  verl/                 Core training framework
 ```
 
 ---
@@ -83,7 +80,7 @@ Data prep:
 python ./examples/data_preprocess/countdown.py --local_dir {path_to_dataset}
 ```
 
-Training scripts are in `TinyZero_Local/` — each `.slurm` file corresponds to a specific experiment configuration (batch size, entropy coeff, KL penalty, etc.). See `reports/` for the hyperparameters and results of each run.
+Training scripts are in `scripts/slurm/` — each `.slurm` file corresponds to a specific experiment configuration (batch size, entropy coeff, KL penalty, etc.). See `reports/` for the hyperparameters and results of each run. Training code is based on [TinyZero](https://github.com/Jiayi-Pan/TinyZero) — clone that repo and apply `patches/megatron_v4.patch` to reproduce the setup.
 
 ---
 
