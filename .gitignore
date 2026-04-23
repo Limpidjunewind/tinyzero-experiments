@@ -2,6 +2,8 @@
 soc_cluster/
 todo/
 interview-qa.md
+community_issues.md
+7b_grpo_experiments.md
 
 # Training framework (use upstream TinyZero directly)
 TinyZero_Local/
