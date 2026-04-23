@@ -1,6 +1,29 @@
-weakness.md
-todo.md
-cluster/
+# Personal / cluster-specific
+soc_cluster/
+todo/
+interview-qa.md
+
+# Training framework (use upstream TinyZero directly)
 TinyZero_Local/
-assets/.DS_Store
+
+# Raw logs and training artifacts
+logs/
+*.log
+
+# Archives
+*.zip
+tinyzero_code_archive/
+tinyzero_experiment_report_0413.zip
+
+# System
 .DS_Store
+assets/.DS_Store
+.obsidian/
+.vscode/
+.claudian/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
