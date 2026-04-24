@@ -25,9 +25,9 @@ The goal was not just to run the numbers — it was to understand *why* training
 
 Fixing the model at Qwen2.5-3B, `batch=128 / mini=64` triggers a clean Aha Moment (score rebounds at step ~75); `batch=64` does not. Larger batches reduce gradient noise, giving the policy a cleaner signal to extract reasoning behavior from.
 
-**3. Entropy collapse is a framework bug, not a hyperparameter problem**
+**3. Entropy collapse is a train-inference mismatch, not a hyperparameter problem**
 
-All three `bs=256` configs crashed mid-training: response floods to 512 identical `!` tokens, score drops to zero, never recovers. Four ablations (`ec=0.001 / 0.01 / 0.05 / kl=0.05`) — none reached Aha Moment. Root cause: **vLLM and FSDP compute `log_prob` differently on padding tokens**, producing a silent numerical inconsistency that eventually triggers NaN → weight corruption. The fix is at the framework level, not the hyperparameter level.
+All three `bs=256` configs crashed mid-training: response floods to 512 identical `!` tokens, score drops to zero, never recovers. Entropy_coeff ablations (`0.001 / 0.01 / 0.05`) delayed but did not eliminate crashes — ruling out entropy collapse as root cause. Root cause: **veRL's hybrid engine discards vLLM's native log_probs and recomputes them with FSDP, causing π_old ≠ actual sampling distribution** (measured ratio peaks up to 1.99×). The fix — passing vLLM's native log_probs directly — eliminates crashes over a 280-step observation window with no loss in final score (~0.60).
 
 **4. Reward balance is a critical design parameter**
 
@@ -45,9 +45,9 @@ webshowcase/          Interactive visual presentations (open in browser)
 reports/              Detailed experiment notes
   4.17 - ppo_countdown_scale_ablation_0.5B_1.5B_3B.md
   4.17 - cold_start_on_1.5B.md
-  4.18 - entropy_coeff_ablation_3B.md
   4.20 - batch_size_aha_moment_ablation.md
-  4.20 - entropy_collapse_analysis.md
+  4.20 - ppo_3b_crash_and_ablations.md   (entropy_coeff & crash ablations)
+  4.24 - train_infer_mismatch.md         (root cause analysis & fix)
   experiment_report_reward.md
   sft-vs-rl-practice.md
 
