@@ -1,0 +1,17 @@
+# Core training framework — install veRL separately:
+#   git clone https://github.com/volcengine/verl && cd verl && pip install -e .
+#
+# The packages below cover what the reward / PRM / eval code in this folder needs.
+# PyTorch / vLLM versions follow upstream TinyZero (CUDA 12.1).
+
+torch==2.4.0
+vllm==0.6.3
+ray
+wandb
+matplotlib
+numpy
+pandas
+pyarrow
+
+# flash-attn must be installed AFTER torch:
+#   pip install flash-attn --no-build-isolation
